@@ -1,3 +1,4 @@
+import 'package:counter/model/counter.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -36,10 +37,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<int> _counters = [0];
+  List<Counter> _counters = [new Counter("Counter")];
 
   void _addCounter() {
-    setState(() => _counters.add(0));
+    setState(() => _counters.add(new Counter()));
   }
 
   void _removeCounter() {
@@ -47,11 +48,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter(int counterId) {
-    setState(() => _counters[counterId]++);
+    setState(() {
+      _counters.firstWhere((counter) => counter.id == counterId).inc();
+    });
   }
 
   void _resetCounter(int counterId) {
-    setState(() => _counters[counterId] = 0);
+    setState(() {
+      _counters.firstWhere((counter) => counter.id == counterId).reset();
+    });
   }
 
   @override
@@ -78,18 +83,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: ListView.builder(
-            itemCount: _counters.length,
-            itemBuilder: (context, i) {
-              return Card(
-                  child: ListTile(
-                    title: Text(
-                      '${_counters[i]}',
-                      style: Theme.of(context).textTheme.display2,
-                    ),
-                    onTap: () => _incrementCounter(i),
-                    onLongPress: () => _resetCounter(i),
-              ));
-            }),
+          itemCount: _counters.length,
+          itemBuilder: (context, i) {
+            var counter = _counters[i];
+            return Card(
+              child: ListTile(
+                title: Text(
+                  '$counter',
+                  style: Theme.of(context).textTheme.display2,
+                ),
+                onTap: () => _incrementCounter(counter.id),
+                onLongPress: () => _resetCounter(counter.id),
+              )
+            );
+          }
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addCounter,
