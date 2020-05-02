@@ -36,23 +36,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<int> _counters = [0];
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  void _addCounter() {
+    setState(() => _counters.add(0));
   }
 
-  void _resetCounter() {
-    setState(() {
-      _counter = 0;
-    });
+  void _removeCounter() {
+    setState(() => _counters.removeLast());
+  }
+
+  void _incrementCounter(int counterId) {
+    setState(() => _counters[counterId]++);
+  }
+
+  void _resetCounter(int counterId) {
+    setState(() => _counters[counterId] = 0);
   }
 
   @override
@@ -71,36 +70,31 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.clear),
-            onPressed: _resetCounter,
+            onPressed: _removeCounter,
           ),
         ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            GestureDetector(
-              onTap: _incrementCounter,
-              child: Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.display4,
-              ),
-            ),
-          ],
-        ),
+        child: ListView.builder(
+            itemCount: _counters.length,
+            itemBuilder: (context, i) {
+              return Card(
+                  child: ListTile(
+                    title: Text(
+                      '${_counters[i]}',
+                      style: Theme.of(context).textTheme.display2,
+                    ),
+                    onTap: () => _incrementCounter(i),
+                    onLongPress: () => _resetCounter(i),
+              ));
+            }),
       ),
-      floatingActionButton: Visibility(
-        visible: _counter == 0,
-        child: FloatingActionButton(
-          onPressed: _incrementCounter,
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addCounter,
+        tooltip: 'Add a new Counter',
+        child: Icon(Icons.add),
       ),
     );
   }
