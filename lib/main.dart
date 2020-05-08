@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListTile(
                 title: Text(
                   '$counter',
-                  style: Theme.of(context).textTheme.display2,
+                  style: Theme.of(context).textTheme.headline3,
                 ),
                 onTap: () => _incrementCounter(counter.id),
                 onLongPress: () => _resetCounter(counter.id),
