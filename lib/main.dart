@@ -1,4 +1,5 @@
 import 'package:counter/model/counter.dart';
+import 'package:counter/model/counter_repository.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -37,26 +38,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Counter> _counters = [new Counter("Counter")];
+  List<Counter> _counters = [];
 
-  void _addCounter() {
-    setState(() => _counters.add(new Counter()));
+  Future loadCounters() async {
+    _counters = await CounterRepository.getAll();
+    setState(() => _counters);
   }
 
-  void _removeCounter() {
-    setState(() => _counters.removeLast());
+  void _addCounter() async {
+    _counters.add(await CounterRepository.create());
+    setState(() => _counters);
   }
 
-  void _incrementCounter(int counterId) {
-    setState(() {
-      _counters.firstWhere((counter) => counter.id == counterId).inc();
-    });
+  void _removeCounter() async {
+    Counter counter = _counters.removeLast();
+    await CounterRepository.delete(counter.id);
+    setState(() => _counters);
   }
 
-  void _resetCounter(int counterId) {
-    setState(() {
-      _counters.firstWhere((counter) => counter.id == counterId).reset();
-    });
+  void _incrementCounter(int counterId) async {
+    Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    counter.inc();
+    await CounterRepository.update(counter);
+    setState(() => _counters);
+  }
+
+  void _resetCounter(int counterId) async {
+    Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    counter.reset();
+    await CounterRepository.update(counter);
+    setState(() => _counters);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadCounters();
   }
 
   @override
