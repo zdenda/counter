@@ -51,31 +51,33 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         String name;
-        return AlertDialog(
-          title: const Text('New counter'),
-          content: TextField(
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Name',
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text('New counter'),
+            content: TextField(
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(
+                labelText: 'Name',
+              ),
+              onChanged: (value) => setState(() => name = value.trim()),
             ),
-            onChanged: (value) => name = value,
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: const Text('CANCEL'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop(name);
-              },
-            ),
-          ],
-        );
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('CANCEL'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              FlatButton(
+                child: const Text('OK'),
+                onPressed: name.isNullOrEmpty() ? null : () {
+                  Navigator.of(context).pop(name);
+                },
+              ),
+            ],
+          );
+        });
       }
     );
 
@@ -92,14 +94,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _incrementCounter(int counterId) async {
-    Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
     await CounterRepository.inc(counter);
     counter.inc();
     setState(() => _counters);
   }
 
   void _resetCounter(int counterId) async {
-    Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
     await CounterRepository.reset(counter.id);
     counter.reset();
     setState(() => _counters);
