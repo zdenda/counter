@@ -13,14 +13,13 @@ class Counter {
 
   void reset() => _value = 0;
   int inc() => ++_value;
-  int dec() => --_value;
+  //TODO: int dec() => --_value;
 
 
   Map<String, dynamic> toMap() {
     return {
       CounterRepository.COL_ID: _id,
       CounterRepository.COL_NAME: _name,
-      CounterRepository.COL_VALUE: _value,
     };
   }
 

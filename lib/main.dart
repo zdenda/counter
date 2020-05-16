@@ -58,15 +58,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter(int counterId) async {
     Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    await CounterRepository.inc(counter);
     counter.inc();
-    await CounterRepository.update(counter);
     setState(() => _counters);
   }
 
   void _resetCounter(int counterId) async {
     Counter counter =_counters.firstWhere((counter) => counter.id == counterId);
+    await CounterRepository.reset(counter.id);
     counter.reset();
-    await CounterRepository.update(counter);
     setState(() => _counters);
   }
 
