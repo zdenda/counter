@@ -74,7 +74,7 @@ class CounterRepository {
     },
   );
 
-  static Future<Counter> create([String name, int value = 0]) async {
+  static Future<Counter> create([String name]) async {
     final Database db = await _database;
     int id = await db.insert(
         TAB_COUNTER,
@@ -83,7 +83,7 @@ class CounterRepository {
         },
         conflictAlgorithm: ConflictAlgorithm.replace
     );
-    return new Counter(name, value, id);
+    return new Counter(name, 0, id);
   }
 
   static Future<void> update(Counter counter) async {

@@ -1,5 +1,6 @@
 import 'package:counter/model/counter.dart';
 import 'package:counter/model/counter_repository.dart';
+import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -45,9 +46,43 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() => _counters);
   }
 
-  void _addCounter() async {
-    _counters.add(await CounterRepository.create());
-    setState(() => _counters);
+  void _showAddCounterDialog() async {
+    String counterName = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        String name;
+        return AlertDialog(
+          title: const Text('New counter'),
+          content: TextField(
+            autofocus: true,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+              labelText: 'Name',
+            ),
+            onChanged: (value) => name = value,
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: const Text('CANCEL'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(name);
+              },
+            ),
+          ],
+        );
+      }
+    );
+
+    if (!counterName.isNullOrEmpty()) {
+      _counters.add(await CounterRepository.create(counterName));
+      setState(() => _counters);
+    }
   }
 
   void _removeCounter() async {
@@ -117,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addCounter,
+        onPressed: _showAddCounterDialog,
         tooltip: 'Add a new Counter',
         child: Icon(Icons.add),
       ),
