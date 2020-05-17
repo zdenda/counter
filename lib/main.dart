@@ -100,13 +100,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() => _counters);
   }
 
-  void _resetCounter(int counterId) async {
-    Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
-    await CounterRepository.reset(counter.id);
-    counter.reset();
-    setState(() => _counters);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -141,14 +134,52 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (context, i) {
             var counter = _counters[i];
             return Card(
-              child: ListTile(
-                title: Text(
-                  '$counter',
-                  style: Theme.of(context).textTheme.headline3,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 16
                 ),
-                onTap: () => _incrementCounter(counter.id),
-                onLongPress: () => _resetCounter(counter.id),
-              )
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text('${counter.name}',
+                                style: Theme.of(context).textTheme.headline4
+                            ),
+                          ),
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text('${counter.name}',
+                                style: Theme.of(context).textTheme.caption
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
+                      child: Text('${counter.value}',
+                          style: Theme.of(context).textTheme.headline3
+                      ),
+                    ),
+                    Ink(
+                      decoration: const ShapeDecoration(
+                        shape: CircleBorder(),
+                      ),
+                      child: IconButton(
+                        iconSize: 36,
+                        icon: Icon(Icons.add_circle_outline),
+                        color: Theme.of(context).accentColor,
+                        onPressed: () => _incrementCounter(counter.id),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           }
         ),

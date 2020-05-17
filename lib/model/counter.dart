@@ -10,6 +10,8 @@ class Counter {
   Counter([this._name, this._value = 0, this._id = 0]);
 
   int get id => _id;
+  String get name => _name;
+  int get value => _value;
 
   void reset() => _value = 0;
   int inc() => ++_value;
