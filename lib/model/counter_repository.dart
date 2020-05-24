@@ -1,8 +1,7 @@
 import 'dart:developer' as developer;
-import 'package:counter/model/counter.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:counter/model/counter.dart';
 
 class CounterRepository {
 
