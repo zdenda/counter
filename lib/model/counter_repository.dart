@@ -128,13 +128,16 @@ class CounterRepository {
   static Future<List<Counter>> getAll() async {
     final Database db = await _database;
     const ALIAS_VALUE = 'value';
+    const ALIAS_LAST = 'last_event';
     // Alternative query with subquery
     //SELECT counter.id, counter.name,
-    //  (SELECT COUNT(id) FROM event WHERE event.counter_id=counter.id) as value
+    //  (SELECT COUNT(id) FROM event WHERE event.counter_id = counter.id) as value
+    //  (SELECT MAX(time) FROM event WHERE event.counter_id = counter.id) as last_event
     //FROM counter ORDER BY counter.name, counter.id
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
       SELECT $TAB_COUNTER.$COL_ID, $TAB_COUNTER.$COL_NAME,
-        COUNT($TAB_EVENT.$COL_C_ID) as $ALIAS_VALUE
+        COUNT($TAB_EVENT.$COL_C_ID) as $ALIAS_VALUE,
+        MAX($TAB_EVENT.$COL_TIME) as $ALIAS_LAST
       FROM $TAB_COUNTER LEFT OUTER JOIN $TAB_EVENT
         ON $TAB_COUNTER.$COL_ID = $TAB_EVENT.$COL_C_ID
       GROUP BY $TAB_COUNTER.$COL_ID
@@ -145,6 +148,9 @@ class CounterRepository {
         maps[i][COL_NAME],
         maps[i][ALIAS_VALUE],
         maps[i][COL_ID],
+        maps[i][ALIAS_LAST] != null
+            ? DateTime.fromMillisecondsSinceEpoch(maps[i][ALIAS_LAST])
+            : null
       );
     });
   }

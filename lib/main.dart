@@ -97,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
     await CounterRepository.inc(counter);
     counter.inc();
+    //_counters.sort((a, b) => b.lastEventTime != null ? b.lastEventTime.compareTo(a.lastEventTime) : -1);
     setState(() => _counters);
   }
 
@@ -151,9 +152,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 style: Theme.of(context).textTheme.headline4
                             ),
                           ),
-                          FittedBox(
+                          if (counter.lastEventTime != null) FittedBox(
                             fit: BoxFit.fitWidth,
-                            child: Text('${counter.name}',
+                            child: Text(
+                                'Last: ${counter.lastEventTime}',
                                 style: Theme.of(context).textTheme.caption
                             ),
                           ),

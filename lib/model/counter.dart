@@ -6,16 +6,24 @@ class Counter {
   int _id;
   String _name;
   int _value;
+  DateTime _lastEventTime;
 
-  Counter([this._name, this._value = 0, this._id = 0]);
+  Counter([this._name, this._value = 0, this._id = 0, this._lastEventTime]);
 
   int get id => _id;
   String get name => _name;
   int get value => _value;
+  DateTime get lastEventTime => _lastEventTime;
 
-  void reset() => _value = 0;
-  int inc() => ++_value;
-  //TODO: int dec() => --_value;
+  void reset() {
+    _lastEventTime = null;
+    _value = 0;
+  }
+  int inc() {
+    _lastEventTime = DateTime.now();
+    return ++_value;
+  }
+  //TODO: int dec()
 
 
   Map<String, dynamic> toMap() {
