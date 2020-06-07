@@ -1,3 +1,4 @@
+import 'package:counter/pages/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:counter/model/counter.dart';
 import 'package:counter/model/counter_repository.dart';
@@ -76,12 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _removeCounter() async {
-    Counter counter = _counters.removeLast();
-    await CounterRepository.delete(counter.id);
-    setState(() => _counters);
-  }
-
   void _incrementCounter(int counterId) async {
     Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
     await CounterRepository.inc(counter);
@@ -109,12 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: _removeCounter,
-          ),
-        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -124,47 +113,50 @@ class _MyHomePageState extends State<MyHomePage> {
             itemBuilder: (context, i) {
               var counter = _counters[i];
               return Card(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            FittedBox(
-                              fit: BoxFit.fitWidth,
-                              child: Text('${counter.name}',
-                                  style: Theme.of(context).textTheme.headline4),
-                            ),
-                            if (counter.lastEventTime != null)
+                child: InkWell(
+                  onTap: () => DetailPage.goTo(context, counter),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
                               FittedBox(
                                 fit: BoxFit.fitWidth,
-                                child: Text('Last: ${counter.lastEventTime}',
-                                    style: Theme.of(context).textTheme.caption),
+                                child: Text('${counter.name}',
+                                    style: Theme.of(context).textTheme.headline4),
                               ),
-                          ],
+                              if (counter.lastEventTime != null)
+                                FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Text('Last: ${counter.lastEventTime}',
+                                      style: Theme.of(context).textTheme.caption),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
-                        child:
-                            Text('${counter.value}', style: Theme.of(context).textTheme.headline3),
-                      ),
-                      Ink(
-                        decoration: const ShapeDecoration(
-                          shape: CircleBorder(),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
+                          child:
+                          Text('${counter.value}', style: Theme.of(context).textTheme.headline3),
                         ),
-                        child: IconButton(
-                          iconSize: 36,
-                          icon: Icon(Icons.add_circle_outline),
-                          color: Theme.of(context).accentColor,
-                          onPressed: () => _incrementCounter(counter.id),
+                        Ink(
+                          decoration: const ShapeDecoration(
+                            shape: CircleBorder(),
+                          ),
+                          child: IconButton(
+                            iconSize: 36,
+                            icon: Icon(Icons.add_circle_outline),
+                            color: Theme.of(context).accentColor,
+                            onPressed: () => _incrementCounter(counter.id),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+                )
               );
             }),
       ),

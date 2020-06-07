@@ -11,7 +11,7 @@ class Counter {
   Counter([this._name, this._value = 0, this._id = 0, this._lastEventTime]);
 
   int get id => _id;
-  String get name => _name;
+  String get name => _name ?? '#$id';
   int get value => _value;
   DateTime get lastEventTime => _lastEventTime;
 

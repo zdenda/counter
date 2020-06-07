@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:counter/model/event.dart';
 import 'package:counter/model/counter.dart';
 
 class CounterRepository {
@@ -150,6 +151,29 @@ class CounterRepository {
         maps[i][ALIAS_LAST] != null
             ? DateTime.fromMillisecondsSinceEpoch(maps[i][ALIAS_LAST])
             : null
+      );
+    });
+  }
+
+  static Future<Counter> get(int id) async {
+    final Database db = await _database;
+    List<Map<String, dynamic>> maps = await db.query(TAB_COUNTER,
+        columns: [COL_ID, COL_NAME], where: "$COL_ID = ?", whereArgs: [id], limit: 1);
+    if (maps.isEmpty) return null;
+    return Counter(maps[0][COL_NAME], 0, maps[0][COL_ID]);
+  }
+
+  static Future<List<Event>> getAllCounterEvents(int counterId) async {
+    final Database db = await _database;
+    final List<Map<String, dynamic>> maps = await db.query(TAB_EVENT,
+        columns: [COL_ID, COL_TIME],
+        where: "$COL_C_ID = ?",
+        whereArgs: [counterId],
+        orderBy: '$COL_TIME DESC');
+    return List.generate(maps.length, (i) {
+      return Event(
+        maps[i][COL_ID],
+        DateTime.fromMillisecondsSinceEpoch(maps[i][COL_TIME]),
       );
     });
   }
