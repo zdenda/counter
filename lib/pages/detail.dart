@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:counter/model/counter.dart';
 import 'package:counter/model/counter_repository.dart';
 import 'package:counter/model/event.dart';
+import 'package:counter/utils/extensions.dart';
 
 
 class DetailArgs {
@@ -15,7 +16,7 @@ class DetailArgs {
 class DetailPage extends StatefulWidget {
   static const String ROUTE = '/detail';
 
-  static goTo(BuildContext context, Counter counter) {
+  static Future<T> goTo<T extends Object>(BuildContext context, Counter counter) {
     //TODO: try https://stackoverflow.com/questions/50818770/passing-data-to-a-stateful-widget
     return Navigator.pushNamed(context, DetailPage.ROUTE,
         arguments: DetailArgs(counter.id, counter.name));
@@ -33,10 +34,71 @@ class _DetailPageState extends State<DetailPage> {
   Future<Counter> _counter;
   Future<List<Event>> _events;
 
-  void _removeCounter(int id) async {
-    await CounterRepository.delete(id);
-    //TODO: remove counter from home page
-    Navigator.pop(context);
+  _showEditDialog(Counter counter) async {
+    Counter newCounter = await showDialog<Counter>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Edit counter'),
+              content: TextFormField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                ),
+                initialValue: counter.name,
+                onChanged: (value) {
+                  value = value.trim();
+                  if (!value.isNullOrEmpty()) counter.name = value;
+                },
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () => Navigator.of(context).pop()
+                ),
+                FlatButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(counter)
+                ),
+              ],
+            );
+          });
+        });
+
+    if (newCounter != null) {
+      await CounterRepository.update(newCounter);
+      _counter = CounterRepository.get(newCounter.id);
+      _counter.whenComplete(() => setState(() {}));
+    }
+  }
+
+  void _removeCounter(Counter counter) async {
+    bool result = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Remove this counter?'),
+            //content: Text("Permanently remove the counter \"${counter.name}\"?"),
+            actions: <Widget>[
+              FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () => Navigator.of(context).pop(false)
+              ),
+              FlatButton(
+                  child: const Text('REMOVE'),
+                  onPressed: () => Navigator.of(context).pop(true)
+              ),
+            ],
+          );
+        }
+    );
+
+    if (result == true) {
+      await CounterRepository.delete(counter.id);
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -62,10 +124,14 @@ class _DetailPageState extends State<DetailPage> {
             appBar: AppBar(
               title: Text(snapshot.data.name),
               actions: <Widget>[
-                /*IconButton(
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _showEditDialog(snapshot.data),
+                ),
+                IconButton(
                   icon: const Icon(Icons.clear),
-                  onPressed: () => _removeCounter(snapshot.data.id),
-                )*/
+                  onPressed: () => _removeCounter(snapshot.data),
+                )
               ],
             ),
             body: Container(

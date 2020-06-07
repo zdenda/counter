@@ -15,6 +15,9 @@ class Counter {
   int get value => _value;
   DateTime get lastEventTime => _lastEventTime;
 
+  set name(String name) => _name = name;
+
+
   void reset() {
     _lastEventTime = null;
     _value = 0;

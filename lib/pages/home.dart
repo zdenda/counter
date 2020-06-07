@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
               var counter = _counters[i];
               return Card(
                 child: InkWell(
-                  onTap: () => DetailPage.goTo(context, counter),
+                  onTap: () => DetailPage.goTo(context, counter).then((_) => loadCounters()),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                     child: Row(
