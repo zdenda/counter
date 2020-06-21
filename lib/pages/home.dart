@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //List<Counter> _counters = []; //moved to AppModel()
 
-  void _showAddCounterDialog() async {
+  void _showAddCounterDialog(context) async {
     String counterName = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
@@ -72,6 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!counterName.isNullOrEmpty()) {
       final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.createCounter(counterName);
+      final snackBar = SnackBar(content: Text('New counter "$counterName" was created!'));
+      Scaffold.of(context).showSnackBar(snackBar);
     }
   }
 
@@ -171,11 +173,15 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddCounterDialog,
-        tooltip: 'Add a new Counter',
-        child: Icon(Icons.add),
-      ),
+      floatingActionButton: Builder(
+        builder: (BuildContext context) {
+          return FloatingActionButton(
+              onPressed: () => _showAddCounterDialog(context),
+              tooltip: 'Add a new Counter',
+              child: Icon(Icons.add),
+          );
+        },
+      )
     );
   }
 
