@@ -1,8 +1,11 @@
-import 'package:counter/model/repository.dart';
+import 'dart:collection';
+
+import 'package:counter/model/app_model.dart';
 import 'package:counter/model/objects/counter.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -28,12 +31,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  List<Counter> _counters = [];
-
-  Future loadCounters() async {
-    _counters = await Repository.getAll();
-    setState(() => _counters);
-  }
+  //List<Counter> _counters = []; //moved to AppModel()
 
   void _showAddCounterDialog() async {
     String counterName = await showDialog<String>(
@@ -72,23 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
         });
 
     if (!counterName.isNullOrEmpty()) {
-      _counters.add(await Repository.create(counterName));
-      setState(() => _counters);
+      final appModel = Provider.of<AppModel>(context, listen: false);
+      await appModel.createCounter(counterName);
     }
   }
 
   void _incrementCounter(int counterId) async {
-    Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
-    await Repository.inc(counter);
-    counter.inc();
-    //_counters.sort((a, b) => b.lastEventTime != null ? b.lastEventTime.compareTo(a.lastEventTime) : -1);
-    setState(() => _counters);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadCounters();
+    final appModel = Provider.of<AppModel>(context, listen: false);
+    await appModel.incCounter(counterId);
   }
 
   @override
@@ -108,57 +97,79 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: ListView.builder(
-            itemCount: _counters.length,
-            itemBuilder: (context, i) {
-              var counter = _counters[i];
-              return Card(
-                child: InkWell(
-                  onTap: () => DetailPage.goTo(context, counter).then((_) => loadCounters()),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Text('${counter.name}',
-                                    style: Theme.of(context).textTheme.headline4),
-                              ),
-                              if (counter.lastEventTime != null)
-                                FittedBox(
-                                  fit: BoxFit.fitWidth,
-                                  child: Text('Last: ${counter.lastEventTime}',
-                                      style: Theme.of(context).textTheme.caption),
+        child: Consumer<AppModel>(
+          builder: (context, appModel, child) {
+            return FutureBuilder<UnmodifiableListView<Counter>>(
+                future: appModel.counters,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                    return ListView.builder(
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, i) {
+                          var counter = snapshot.data[i];
+                          return Card(
+                              child: InkWell(
+                                onTap: () => DetailPage.goTo(context, counter).then((_) => appModel.forceUpdate()),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 16
+                                  ),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            FittedBox(
+                                              fit: BoxFit.fitWidth,
+                                              child: Text('${counter.name}',
+                                                style: Theme.of(context).textTheme.headline4
+                                              ),
+                                            ),
+                                            if (counter.lastEventTime != null)
+                                              FittedBox(
+                                                fit: BoxFit.fitWidth,
+                                                child: Text(
+                                                  'Last: ${counter.lastEventTime}',
+                                                  style: Theme.of(context).textTheme.caption
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
+                                        child: Text('${counter.value}',
+                                          style: Theme.of(context).textTheme.headline3),
+                                      ),
+                                      Ink(
+                                        decoration: const ShapeDecoration(
+                                          shape: CircleBorder(),
+                                        ),
+                                        child: IconButton(
+                                          iconSize: 36,
+                                          icon: Icon(Icons.add_circle_outline),
+                                          color: Theme.of(context).accentColor,
+                                          onPressed: () => _incrementCounter(counter.id),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
-                          child:
-                          Text('${counter.value}', style: Theme.of(context).textTheme.headline3),
-                        ),
-                        Ink(
-                          decoration: const ShapeDecoration(
-                            shape: CircleBorder(),
-                          ),
-                          child: IconButton(
-                            iconSize: 36,
-                            icon: Icon(Icons.add_circle_outline),
-                            color: Theme.of(context).accentColor,
-                            onPressed: () => _incrementCounter(counter.id),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              );
-            }),
+                              )
+                          );
+                        }
+                    );
+                  }/* else if (snapshot.data.isEmpty) {
+                    //TODO: show some info message
+                  }*/
+                  return snapshot.hasError
+                      ? Text("${snapshot.error}")
+                      : CircularProgressIndicator();
+                }
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddCounterDialog,
