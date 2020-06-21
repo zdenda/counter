@@ -1,10 +1,13 @@
 import 'dart:developer' as developer;
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:counter/model/event.dart';
-import 'package:counter/model/counter.dart';
 
-class CounterRepository {
+import 'objects/counter.dart';
+import 'objects/event.dart';
+
+
+class Repository {
 
   static const String TAB_COUNTER = 'counter';
   static const String TAB_EVENT = 'event';
@@ -79,7 +82,7 @@ class CounterRepository {
     int id = await db.insert(
         TAB_COUNTER,
         {
-          CounterRepository.COL_NAME: name,
+          Repository.COL_NAME: name,
         },
         conflictAlgorithm: ConflictAlgorithm.replace
     );
@@ -101,7 +104,7 @@ class CounterRepository {
     await db.insert(
       TAB_EVENT,
       {
-        CounterRepository.COL_C_ID: counter.id,
+        Repository.COL_C_ID: counter.id,
       },
       conflictAlgorithm: ConflictAlgorithm.replace
     );

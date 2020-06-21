@@ -1,8 +1,8 @@
+import 'package:counter/model/repository.dart';
+import 'package:counter/model/objects/counter.dart';
 import 'package:counter/pages/detail.dart';
-import 'package:flutter/material.dart';
-import 'package:counter/model/counter.dart';
-import 'package:counter/model/counter_repository.dart';
 import 'package:counter/utils/extensions.dart';
+import 'package:flutter/material.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -31,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Counter> _counters = [];
 
   Future loadCounters() async {
-    _counters = await CounterRepository.getAll();
+    _counters = await Repository.getAll();
     setState(() => _counters);
   }
 
@@ -72,14 +72,14 @@ class _MyHomePageState extends State<MyHomePage> {
         });
 
     if (!counterName.isNullOrEmpty()) {
-      _counters.add(await CounterRepository.create(counterName));
+      _counters.add(await Repository.create(counterName));
       setState(() => _counters);
     }
   }
 
   void _incrementCounter(int counterId) async {
     Counter counter = _counters.firstWhere((counter) => counter.id == counterId);
-    await CounterRepository.inc(counter);
+    await Repository.inc(counter);
     counter.inc();
     //_counters.sort((a, b) => b.lastEventTime != null ? b.lastEventTime.compareTo(a.lastEventTime) : -1);
     setState(() => _counters);

@@ -1,4 +1,4 @@
-import 'counter_repository.dart';
+import '../repository.dart';
 
 
 class Counter {
@@ -29,10 +29,11 @@ class Counter {
   //TODO: int dec()
 
 
+  //TODO: create a special class with all repository "converters"
   Map<String, dynamic> toMap() {
     return {
-      CounterRepository.COL_ID: _id,
-      CounterRepository.COL_NAME: _name,
+      Repository.COL_ID: _id,
+      Repository.COL_NAME: _name,
     };
   }
 

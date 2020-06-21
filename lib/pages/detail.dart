@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:counter/model/counter.dart';
-import 'package:counter/model/counter_repository.dart';
-import 'package:counter/model/event.dart';
+import 'package:counter/model/repository.dart';
+import 'package:counter/model/objects/counter.dart';
+import 'package:counter/model/objects/event.dart';
 import 'package:counter/utils/extensions.dart';
+import 'package:flutter/material.dart';
 
 
 class DetailArgs {
@@ -68,8 +68,8 @@ class _DetailPageState extends State<DetailPage> {
         });
 
     if (newCounter != null) {
-      await CounterRepository.update(newCounter);
-      _counter = CounterRepository.get(newCounter.id);
+      await Repository.update(newCounter);
+      _counter = Repository.get(newCounter.id);
       _counter.whenComplete(() => setState(() {}));
     }
   }
@@ -96,7 +96,7 @@ class _DetailPageState extends State<DetailPage> {
     );
 
     if (result == true) {
-      await CounterRepository.delete(counter.id);
+      await Repository.delete(counter.id);
       Navigator.pop(context);
     }
   }
@@ -107,8 +107,8 @@ class _DetailPageState extends State<DetailPage> {
     Future.delayed(Duration.zero, () {
       final DetailArgs args = ModalRoute.of(context).settings.arguments;
       //TODO: cancel loading when navigating from page
-      _counter = CounterRepository.get(args.counterId);
-      _events = CounterRepository.getAllCounterEvents(args.counterId);
+      _counter = Repository.get(args.counterId);
+      _events = Repository.getAllCounterEvents(args.counterId);
       Future.wait([_counter]).whenComplete(() => setState(() {}));
     });
   }
