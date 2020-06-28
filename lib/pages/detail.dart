@@ -1,8 +1,9 @@
-import 'package:counter/model/repository.dart';
+import 'package:counter/model/app_model.dart';
 import 'package:counter/model/objects/counter.dart';
 import 'package:counter/model/objects/event.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class DetailArgs {
@@ -31,11 +32,8 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
 
-  Future<Counter> _counter;
-  Future<List<Event>> _events;
-
   _showEditDialog(Counter counter) async {
-    Counter newCounter = await showDialog<Counter>(
+    Counter editedCounter = await showDialog<Counter>(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, setState) {
@@ -55,26 +53,25 @@ class _DetailPageState extends State<DetailPage> {
               ),
               actions: <Widget>[
                 FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () => Navigator.of(context).pop()
+                    child: const Text('CANCEL'),
+                    onPressed: () => Navigator.of(context).pop()
                 ),
                 FlatButton(
-                  child: const Text('OK'),
-                  onPressed: () => Navigator.of(context).pop(counter)
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.of(context).pop(counter)
                 ),
               ],
             );
           });
         });
 
-    if (newCounter != null) {
-      await Repository.update(newCounter);
-      _counter = Repository.get(newCounter.id);
-      _counter.whenComplete(() => setState(() {}));
+    if (editedCounter != null) {
+      final appModel = Provider.of<AppModel>(context, listen: false);
+      await appModel.updateCounter(editedCounter);
     }
   }
 
-  void _removeCounter(Counter counter) async {
+  void _showRemoveDialog(Counter counter) async {
     bool result = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
@@ -96,88 +93,84 @@ class _DetailPageState extends State<DetailPage> {
     );
 
     if (result == true) {
-      await Repository.delete(counter.id);
+      final appModel = Provider.of<AppModel>(context, listen: false);
+      await appModel.deleteCounter(counter);
       Navigator.pop(context);
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      final DetailArgs args = ModalRoute.of(context).settings.arguments;
-      //TODO: cancel loading when navigating from page
-      _counter = Repository.get(args.counterId);
-      _events = Repository.getAllCounterEvents(args.counterId);
-      Future.wait([_counter]).whenComplete(() => setState(() {}));
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final DetailArgs args = ModalRoute.of(context).settings.arguments;
-    return FutureBuilder<Counter>(
-      future: _counter,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(snapshot.data.name),
-              actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditDialog(snapshot.data),
+    return Consumer<AppModel>(
+      builder: (context, appModel, child) {
+        return FutureBuilder<Counter>(
+          future: appModel.getCounter(args.counterId),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(snapshot.data.name),
+                  actions: <Widget>[
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _showEditDialog(snapshot.data),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () => _showRemoveDialog(snapshot.data),
+                    )
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () => _removeCounter(snapshot.data),
-                )
-              ],
-            ),
-            body: Container(
-              child: FutureBuilder<List<Event>>(
-                future: _events,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError ||
-                      (snapshot.hasData && snapshot.data.isEmpty) ||
-                      snapshot.data == null) {
-                    return Text('${snapshot.error ?? ''}');
-                  } else {
-                    return Column(
-                      children: <Widget>[
-                        Text('${snapshot.data.length}',
-                            style: Theme.of(context).textTheme.headline3),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (context, index) {
-                              var event = snapshot.data[index];
-                              return ListTile(
-                                title: Text(
-                                  '${event.time}',
-                                  style: Theme.of(context).textTheme.headline5,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                },
+                body: Container(
+                  child: FutureBuilder<List<Event>>(
+                    future: appModel.getEvents(args.counterId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError ||
+                          (snapshot.hasData && snapshot.data.isEmpty) ||
+                          snapshot.data == null) {
+                        return Text('${snapshot.error ?? ''}');
+                      } else {
+                        return Column(
+                          children: <Widget>[
+                            Text('${snapshot.data.length}',
+                                style: Theme.of(context).textTheme.headline3),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: snapshot.data.length,
+                                itemBuilder: (context, index) {
+                                  var event = snapshot.data[index];
+                                  return ListTile(
+                                    title: Text(
+                                      '${event.time}',
+                                      style: Theme.of(context).textTheme.headline5,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ),
+              );
+            }
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('${args.title}…'),
               ),
-            ),
-          );
-        }
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('${args.title}…'),
-          ),
-          body: Center(
-            child: snapshot.hasError ? Text("${snapshot.error}") : CircularProgressIndicator(),
-          ),
+              body: Center(
+                child: snapshot.hasError
+                    ? Text("${snapshot.error}")
+                    : CircularProgressIndicator(),
+              ),
+            );
+          },
         );
       },
     );
   }
+
 }
