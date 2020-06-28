@@ -162,9 +162,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         }
                     );
-                  }/* else if (snapshot.data.isEmpty) {
-                    //TODO: show some info message
-                  }*/
+                  } else if (snapshot.hasData && snapshot.data.isEmpty) {
+                    return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 16
+                        ),
+                        child: Text("Tap on the + button to create a new counter.",
+                          style: Theme.of(context).textTheme.headline4,
+                          textAlign: TextAlign.center,
+                        )
+                    );
+                  }
                   return snapshot.hasError
                       ? Text("${snapshot.error}")
                       : CircularProgressIndicator();
@@ -177,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) {
           return FloatingActionButton(
               onPressed: () => _showAddCounterDialog(context),
-              tooltip: 'Add a new Counter',
+              tooltip: 'Create a new Counter',
               child: Icon(Icons.add),
           );
         },
