@@ -111,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           var counter = snapshot.data[i];
                           return Card(
                               child: InkWell(
-                                onTap: () => DetailPage.goTo(context, counter).then((_) => appModel.forceUpdate()),
+                                onTap: () => DetailPage.goTo(context, counter),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 8, horizontal: 16

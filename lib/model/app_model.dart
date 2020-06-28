@@ -10,11 +10,11 @@ import 'objects/counter.dart';
 class AppModel extends ChangeNotifier {
 
   final Map<int, List<Event>> _events = {};
-  final List<Counter> _counters = [];
+  List<Counter> _counters = [];
 
   Future<UnmodifiableListView<Counter>> get counters async {
     if (_counters.isEmpty) {
-      _counters.addAll(await Repository.getAll());
+      _counters = await Repository.getAll();
     }
     return UnmodifiableListView(_counters);
   }
