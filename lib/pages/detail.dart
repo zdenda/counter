@@ -33,6 +33,11 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
 
+  _incrementCounter(int counterId) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+    await appModel.incCounter(counterId);
+  }
+
   _showEditDialog(Counter counter) async {
     Counter editedCounter = await showDialog<Counter>(
         context: context,
@@ -234,6 +239,10 @@ class _DetailPageState extends State<DetailPage> {
                       }
                     },
                   ),
+                ),
+                floatingActionButton: FloatingActionButton(
+                  child: Icon(Icons.plus_one),
+                  onPressed: () => _incrementCounter(snapshot.data.id),
                 ),
               );
             }
