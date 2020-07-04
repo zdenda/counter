@@ -3,6 +3,7 @@ import 'package:counter/model/objects/counter.dart';
 import 'package:counter/model/objects/event.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 
 
@@ -136,14 +137,21 @@ class _DetailPageState extends State<DetailPage> {
                             Text('${snapshot.data.length}',
                                 style: Theme.of(context).textTheme.headline3),
                             Expanded(
-                              child: ListView.builder(
+                              child: ListView.separated(
                                 itemCount: snapshot.data.length,
+                                separatorBuilder: (context, index) => Divider(),
                                 itemBuilder: (context, index) {
                                   var event = snapshot.data[index];
+                                  var now = DateTime.now();
                                   return ListTile(
-                                    title: Text(
-                                      '${event.time}',
-                                      style: Theme.of(context).textTheme.headline5,
+                                    title: FittedBox(
+                                      fit: BoxFit.fitWidth,
+                                      child: Text(
+                                        '${Jiffy(event.time).format(event.time.year == now.year
+                                            ? 'EEE, MMM d HH:mm'
+                                            : 'MMM d, yyyy')} • ${Jiffy(event.time).fromNow()}',
+                                        style: Theme.of(context).textTheme.headline5,
+                                      ),
                                     ),
                                   );
                                 },
@@ -162,9 +170,7 @@ class _DetailPageState extends State<DetailPage> {
                 title: Text('${args.title}…'),
               ),
               body: Center(
-                child: snapshot.hasError
-                    ? Text("${snapshot.error}")
-                    : CircularProgressIndicator(),
+                child: snapshot.hasError ? Text("${snapshot.error}") : CircularProgressIndicator(),
               ),
             );
           },

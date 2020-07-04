@@ -5,6 +5,7 @@ import 'package:counter/model/objects/counter.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 
 
@@ -132,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               FittedBox(
                                                 fit: BoxFit.fitWidth,
                                                 child: Text(
-                                                  'Last: ${counter.lastEventTime}',
+                                                  'Last time: ${Jiffy(counter.lastEventTime).fromNow()}',
                                                   style: Theme.of(context).textTheme.caption
                                                 ),
                                               ),
