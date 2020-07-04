@@ -62,6 +62,15 @@ class AppModel extends ChangeNotifier {
     return;
   }
 
+  Future<void> deleteEvent(Event event) async {
+    await Repository.deleteEvent(event.id);
+    //TODO: there might be a better way then clear everything
+    _counters.clear();
+    _events.clear();
+    notifyListeners();
+    return;
+  }
+
   forceUpdate() {
     _counters.clear();
     _events.clear();

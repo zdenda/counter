@@ -181,4 +181,14 @@ class Repository {
     });
   }
 
+  static Future<void> deleteEvent(int id) async {
+    final db = await _database;
+    await db.delete(
+      TAB_EVENT,
+      where: "$COL_ID = ?",
+      whereArgs: [id],
+    );
+
+  }
+
 }

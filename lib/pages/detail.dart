@@ -100,6 +100,33 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  void _showDeleteEventDialog(Event event) async {
+    bool result = await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Remove event?'),
+            //content: Text("Permanently remove the counter \"${counter.name}\"?"),
+            actions: <Widget>[
+              FlatButton(
+                  child: const Text('CANCEL'),
+                  onPressed: () => Navigator.of(context).pop(false)
+              ),
+              FlatButton(
+                  child: const Text('REMOVE'),
+                  onPressed: () => Navigator.of(context).pop(true)
+              ),
+            ],
+          );
+        }
+    );
+
+    if (result == true) {
+      final appModel = Provider.of<AppModel>(context, listen: false);
+      await appModel.deleteEvent(event);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final DetailArgs args = ModalRoute.of(context).settings.arguments;
@@ -152,6 +179,10 @@ class _DetailPageState extends State<DetailPage> {
                                             : 'MMM d, yyyy')} • ${Jiffy(event.time).fromNow()}',
                                         style: Theme.of(context).textTheme.headline5,
                                       ),
+                                    ),
+                                    trailing: IconButton(
+                                      icon: Icon(Icons.delete_forever),
+                                      onPressed: () => _showDeleteEventDialog(event),
                                     ),
                                   );
                                 },
