@@ -205,8 +205,13 @@ class _DetailPageState extends State<DetailPage> {
                       } else {
                         return Column(
                           children: <Widget>[
-                            Text('${snapshot.data.length}',
+                            Container(
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              color: Theme.of(context).primaryColorLight,
+                              child: Text('${snapshot.data.length}',
                                 style: Theme.of(context).textTheme.headline3),
+                            ),
                             Expanded(
                               child: ListView.separated(
                                 itemCount: snapshot.data.length,
