@@ -19,6 +19,7 @@ class Repository {
   // tab EVENT columns
   static const String COL_C_ID = 'counter_id';
   static const String COL_TIME = 'time';
+  static const String COL_NOTE = 'note';
 
   static final Future<Database> _database = _getDatabase();
 
@@ -44,6 +45,7 @@ class Repository {
               cast((strftime('%s','now') || substr(strftime('%f','now'),4))
                 as int)
             ),
+            $COL_NOTE TEXT,
             FOREIGN KEY ($COL_C_ID) REFERENCES $TAB_COUNTER($COL_ID)
               ON DELETE CASCADE ON UPDATE CASCADE
           );
@@ -51,9 +53,9 @@ class Repository {
         await txn.execute('''
           CREATE INDEX index_${TAB_EVENT}_$COL_C_ID ON $TAB_EVENT ($COL_C_ID);
         ''');
-      }) ;
+      });
     },
-    version: 2,
+    version: 3,
     onUpgrade: (db, oldVersion, newVersion) async {
       developer.log('Upgrading database form $oldVersion to $newVersion');
       if (oldVersion < 2) {
@@ -71,6 +73,13 @@ class Repository {
           ''');
           await txn.execute('''
             CREATE INDEX index_event_counter_id ON event (counter_id);
+          ''');
+        });
+      }
+      if (oldVersion < 3) {
+        await db.transaction((txn) async {
+          await txn.execute('''
+            ALTER TABLE event ADD COLUMN note TEXT;
           ''');
         });
       }
@@ -169,7 +178,7 @@ class Repository {
   static Future<List<Event>> getAllCounterEvents(int counterId) async {
     final Database db = await _database;
     final List<Map<String, dynamic>> maps = await db.query(TAB_EVENT,
-        columns: [COL_ID, COL_TIME],
+        columns: [COL_ID, COL_TIME, COL_NOTE],
         where: "$COL_C_ID = ?",
         whereArgs: [counterId],
         orderBy: '$COL_TIME DESC');
@@ -177,6 +186,7 @@ class Repository {
       return Event(
         maps[i][COL_ID],
         DateTime.fromMillisecondsSinceEpoch(maps[i][COL_TIME]),
+        maps[i][COL_NOTE],
       );
     });
   }
@@ -189,6 +199,18 @@ class Repository {
       whereArgs: [id],
     );
 
+  }
+
+  static Future<void> addEventNote(int id, String note) async {
+    final db = await _database;
+    await db.update(
+      TAB_EVENT,
+      {
+        Repository.COL_NOTE: note,
+      },
+      where: "$COL_ID = ?",
+      whereArgs: [id],
+    );
   }
 
 }

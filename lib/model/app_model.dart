@@ -71,6 +71,13 @@ class AppModel extends ChangeNotifier {
     return;
   }
 
+  Future<void> addNote(Event event, String note) async {
+    await Repository.addEventNote(event.id, note);
+    event.note = note;
+    notifyListeners();
+    return;
+  }
+
   forceUpdate() {
     _counters.clear();
     _events.clear();

@@ -127,6 +127,45 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  _showEditNoteDialog(Event event) async {
+    String note = await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          String result;
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Edit event note'),
+              content: TextFormField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: 'Note',
+                ),
+                initialValue: event.note ?? "",
+                onChanged: (value) {
+                  result = value.trim();
+                },
+              ),
+              actions: <Widget>[
+                FlatButton(
+                    child: const Text('CANCEL'),
+                    onPressed: () => Navigator.of(context).pop()
+                ),
+                FlatButton(
+                    child: const Text('OK'),
+                    onPressed: () => Navigator.of(context).pop(result)
+                ),
+              ],
+            );
+          });
+        });
+
+    if (note != null) {
+      final appModel = Provider.of<AppModel>(context, listen: false);
+      await appModel.addNote(event, note);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final DetailArgs args = ModalRoute.of(context).settings.arguments;
@@ -180,10 +219,12 @@ class _DetailPageState extends State<DetailPage> {
                                         style: Theme.of(context).textTheme.headline5,
                                       ),
                                     ),
+                                    subtitle: !event.note.isNullOrEmpty() ? Text(event.note) : null,
                                     trailing: IconButton(
                                       icon: Icon(Icons.delete_forever),
                                       onPressed: () => _showDeleteEventDialog(event),
                                     ),
+                                    onTap: () => _showEditNoteDialog(event),
                                   );
                                 },
                               ),
