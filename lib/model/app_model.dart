@@ -47,6 +47,7 @@ class AppModel extends ChangeNotifier {
 
   Future<void> deleteCounter(Counter counter) async {
     await Repository.delete(counter.id);
+    _counters.remove(counter);
     notifyListeners();
     return;
   }
