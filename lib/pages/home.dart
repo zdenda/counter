@@ -6,6 +6,7 @@ import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 
@@ -33,6 +34,44 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   //List<Counter> _counters = []; //moved to AppModel()
+
+  void _showAboutDialog() async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.lightBlue.shade50,
+            title: Image.asset('assets/icon/ic_launcher.png', height: 70, width: 70),
+            content: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Counter', style: Theme.of(context).textTheme.headline4),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 24),
+                      child: FutureBuilder<PackageInfo>(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+                          return Text('Version: ${snapshot.hasData ? snapshot.data.version : '…'}',
+                              style: Theme.of(context).textTheme.headline6);
+                        },
+                      ),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
 
   void _showAddCounterDialog(context) async {
     String counterName = await showDialog<String>(
@@ -96,6 +135,17 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        actions: <Widget>[
+          PopupMenuButton<Function>(
+            itemBuilder: (BuildContext context) {
+              return [
+                //PopupMenuItem<Function>(child: Text("Export"), value: () => {}),
+                PopupMenuItem<Function>(child: Text('About'), value: _showAboutDialog),
+              ];
+            },
+            onSelected: (value) => value.call()
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
