@@ -1,14 +1,21 @@
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:counter/model/app_model.dart';
 import 'package:counter/model/objects/counter.dart';
+import 'package:counter/model/objects/event.dart';
+import 'package:counter/model/repository.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share/share.dart';
 
+enum DialogResult { export, import }
 
 class MyHomePage extends StatefulWidget {
 
@@ -71,6 +78,40 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }
     );
+  }
+
+  void _showExportDialog() async {
+    switch (await showDialog<DialogResult>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Select export or import'),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, DialogResult.export);
+                },
+                child: const Text('Export'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, DialogResult.import);
+                },
+                child: const Text('Import'),
+              ),
+            ],
+          );
+        })) {
+      case DialogResult.export:
+        _exportData();
+        break;
+      case DialogResult.import:
+        _importData();
+        break;
+      default:
+        // dialog dismissed
+        break;
+    }
   }
 
   void _showAddCounterDialog(context) async {
@@ -139,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
           PopupMenuButton<Function>(
             itemBuilder: (BuildContext context) {
               return [
-                //PopupMenuItem<Function>(child: Text("Export"), value: () => {}),
+                PopupMenuItem<Function>(child: Text('Export / Import'), value: _showExportDialog),
                 PopupMenuItem<Function>(child: Text('About'), value: _showAboutDialog),
               ];
             },
@@ -244,4 +285,28 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+}
+
+void _exportData() async {
+  Directory tempDir = await getTemporaryDirectory();
+  final String date = Jiffy().format("yyyy-MM-dd");
+  File exportFile = new File('${tempDir.path}/counter-data-export_$date.json');
+
+  List<Map<String, dynamic>> data = [];
+
+  final List<Counter> counters = await Repository.getAll();
+  await Future.forEach(counters, (counter) async {
+    List<Event> events = await Repository.getAllCounterEvents(counter.id);
+    Map<String, dynamic> map = counter.toJson();
+    map['events'] = events;
+    data.add(map);
+  });
+
+  //debugPrint(data.toString());
+  await exportFile.writeAsString(jsonEncode(data));
+  Share.shareFiles([exportFile.path], subject: "Counter data export", mimeTypes: ["application/json"]);
+}
+
+void _importData() async {
+  //TODO: implement data import
 }

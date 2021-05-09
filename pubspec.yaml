@@ -28,6 +28,8 @@ dependencies:
   provider: 4.3.3
   jiffy: 4.1.0
   package_info: 0.4.3
+  share: 2.0.1
+  path_provider: 2.0.1
 
 dev_dependencies:
   flutter_test:
