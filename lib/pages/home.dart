@@ -81,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showExportDialog() async {
+  void _showExportDialog(BuildContext context, AppModel appModel) async {
     switch (await showDialog<DialogResult>(
         context: context,
         builder: (BuildContext context) {
@@ -104,10 +104,19 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         })) {
       case DialogResult.export:
-        _exportData();
+        if (await _exportData()) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('App data were exported to a file.'))
+          );
+        }
         break;
       case DialogResult.import:
-        _importData();
+        if (await _importData()) {
+          appModel.forceUpdate();
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Application data were imported.'))
+          );
+        }
         break;
       default:
         // dialog dismissed
@@ -172,123 +181,127 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        actions: <Widget>[
-          PopupMenuButton<Function>(
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem<Function>(child: Text('Export / Import'), value: _showExportDialog),
-                PopupMenuItem<Function>(child: Text('About'), value: _showAboutDialog),
-              ];
-            },
-            onSelected: (value) => value.call()
+    return Consumer<AppModel>(builder: (context, appModel, child) {
+      return Scaffold(
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text(widget.title),
+            actions: <Widget>[
+              PopupMenuButton<Function>(
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      PopupMenuItem<Function>(
+                          child: Text('Export / Import'),
+                          value: () => _showExportDialog(context, appModel)
+                      ),
+                      PopupMenuItem<Function>(
+                          child: Text('About'),
+                          value: _showAboutDialog
+                      ),
+                    ];
+                  },
+                  onSelected: (value) => value.call()
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Consumer<AppModel>(
-          builder: (context, appModel, child) {
-            return FutureBuilder<UnmodifiableListView<Counter>>(
-                future: appModel.counters,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data.isNotEmpty) {
-                    return ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (context, i) {
-                          var counter = snapshot.data[i];
-                          return Card(
-                              child: InkWell(
-                                onTap: () => DetailPage.goTo(context, counter),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16
-                                  ),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            FittedBox(
-                                              fit: BoxFit.fitWidth,
-                                              child: Text('${counter.name}',
-                                                style: Theme.of(context).textTheme.headline4
-                                              ),
-                                            ),
-                                            if (counter.lastEventTime != null)
+          body: Center(
+              // Center is a layout widget. It takes a single child and positions it
+              // in the middle of the parent.
+              child: FutureBuilder<UnmodifiableListView<Counter>>(
+                  future: appModel.counters,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                      return ListView.builder(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, i) {
+                            var counter = snapshot.data[i];
+                            return Card(
+                                child: InkWell(
+                                  onTap: () => DetailPage.goTo(context, counter),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16
+                                    ),
+                                    child: Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
                                               FittedBox(
                                                 fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  'Last time: ${Jiffy(counter.lastEventTime).fromNow()}',
-                                                  style: Theme.of(context).textTheme.caption
+                                                child: Text('${counter.name}',
+                                                    style: Theme.of(context).textTheme.headline4
                                                 ),
                                               ),
-                                          ],
+                                              if (counter.lastEventTime != null)
+                                                FittedBox(
+                                                  fit: BoxFit.fitWidth,
+                                                  child: Text(
+                                                      'Last time: ${Jiffy(counter.lastEventTime)
+                                                          .fromNow()}',
+                                                      style: Theme.of(context).textTheme.caption
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
-                                        child: Text('${counter.value}',
-                                          style: Theme.of(context).textTheme.headline3),
-                                      ),
-                                      Ink(
-                                        decoration: const ShapeDecoration(
-                                          shape: CircleBorder(),
+                                        Padding(
+                                          padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
+                                          child: Text('${counter.value}',
+                                              style: Theme.of(context).textTheme.headline3),
                                         ),
-                                        child: IconButton(
-                                          iconSize: 36,
-                                          icon: Icon(Icons.add_circle_outline),
-                                          color: Theme.of(context).accentColor,
-                                          onPressed: () => _incrementCounter(counter.id),
+                                        Ink(
+                                          decoration: const ShapeDecoration(
+                                            shape: CircleBorder(),
+                                          ),
+                                          child: IconButton(
+                                            iconSize: 36,
+                                            icon: Icon(Icons.add_circle_outline),
+                                            color: Theme.of(context).accentColor,
+                                            onPressed: () => _incrementCounter(counter.id),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              )
-                          );
-                        }
-                    );
-                  } else if (snapshot.hasData && snapshot.data.isEmpty) {
-                    return Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 16
-                        ),
-                        child: Text("Tap on the + button to create a new counter.",
-                          style: Theme.of(context).textTheme.headline4,
-                          textAlign: TextAlign.center,
-                        )
-                    );
+                                )
+                            );
+                          }
+                      );
+                    } else if (snapshot.hasData && snapshot.data.isEmpty) {
+                      return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                          child: Text(
+                            "Tap on the + button to create a new counter.",
+                            style: Theme.of(context).textTheme.headline4,
+                            textAlign: TextAlign.center,
+                          )
+                      );
+                    }
+                    return snapshot.hasError
+                        ? Text("${snapshot.error}")
+                        : CircularProgressIndicator();
                   }
-                  return snapshot.hasError
-                      ? Text("${snapshot.error}")
-                      : CircularProgressIndicator();
-                }
-            );
-          },
-        ),
-      ),
-      floatingActionButton: Builder(
-        builder: (BuildContext context) {
-          return FloatingActionButton(
-              onPressed: () => _showAddCounterDialog(context),
-              tooltip: 'Create a new Counter',
-              child: Icon(Icons.add),
-          );
-        },
-      )
-    );
+              )
+          ),
+          floatingActionButton: Builder(
+            builder: (BuildContext context) {
+              return FloatingActionButton(
+                onPressed: () => _showAddCounterDialog(context),
+                tooltip: 'Create a new Counter',
+                child: Icon(Icons.add),
+              );
+            },
+          )
+      );
+    });
   }
 
 }
 
-void _exportData() async {
+Future<bool> _exportData() async {
   Directory tempDir = await getTemporaryDirectory();
   final String date = Jiffy().format("yyyy-MM-dd");
   File exportFile = new File('${tempDir.path}/counter-data-export_$date.json');
@@ -298,7 +311,7 @@ void _exportData() async {
   final List<Counter> counters = await Repository.getAll();
   await Future.forEach(counters, (counter) async {
     List<Event> events = await Repository.getAllCounterEvents(counter.id);
-    events.sort((a,b) => a.id.compareTo(b.id)); // sort events by IDs
+    events.sort((a, b) => a.id.compareTo(b.id)); // sort events by IDs
     Map<String, dynamic> map = counter.toJson();
     map['events'] = events;
     data.add(map);
@@ -306,12 +319,15 @@ void _exportData() async {
 
   await exportFile.writeAsString(jsonEncode(data));
 
-  Share.shareFiles([exportFile.path], subject: "Counter data export", mimeTypes: ["application/json"]);
+  await Share.shareFiles([exportFile.path],
+      subject: "Counter data export", mimeTypes: ["application/json"]);
+
+  return true;
 }
 
-void _importData() async {
+Future<bool> _importData() async {
   FilePickerResult result = await FilePicker.platform.pickFiles();
-  if(result == null) return; // User canceled the picker
+  if (result == null) return false; // User canceled the picker
 
   File file = File(result.files.single.path);
 
@@ -328,4 +344,6 @@ void _importData() async {
     });
 
   });
+
+  return true;
 }
