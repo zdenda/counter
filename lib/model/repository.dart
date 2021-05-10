@@ -191,6 +191,20 @@ class Repository {
     });
   }
 
+  static Future<Event> createEvent(Counter counter, DateTime time, String note) async {
+    final Database db = await _database;
+    int id = await db.insert(
+        TAB_EVENT,
+        {
+          Repository.COL_C_ID: counter.id,
+          Repository.COL_TIME: time.millisecondsSinceEpoch,
+          Repository.COL_NOTE: note
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace
+    );
+    return new Event(id, time, note);
+  }
+
   static Future<void> deleteEvent(int id) async {
     final db = await _database;
     await db.delete(
@@ -198,7 +212,6 @@ class Repository {
       where: "$COL_ID = ?",
       whereArgs: [id],
     );
-
   }
 
   static Future<void> addEventNote(int id, String note) async {

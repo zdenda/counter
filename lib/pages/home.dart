@@ -8,6 +8,7 @@ import 'package:counter/model/objects/event.dart';
 import 'package:counter/model/repository.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:package_info/package_info.dart';
@@ -297,16 +298,34 @@ void _exportData() async {
   final List<Counter> counters = await Repository.getAll();
   await Future.forEach(counters, (counter) async {
     List<Event> events = await Repository.getAllCounterEvents(counter.id);
+    events.sort((a,b) => a.id.compareTo(b.id)); // sort events by IDs
     Map<String, dynamic> map = counter.toJson();
     map['events'] = events;
     data.add(map);
   });
 
-  //debugPrint(data.toString());
   await exportFile.writeAsString(jsonEncode(data));
+
   Share.shareFiles([exportFile.path], subject: "Counter data export", mimeTypes: ["application/json"]);
 }
 
 void _importData() async {
-  //TODO: implement data import
+  FilePickerResult result = await FilePicker.platform.pickFiles();
+  if(result == null) return; // User canceled the picker
+
+  File file = File(result.files.single.path);
+
+  List<dynamic> data = jsonDecode(await file.readAsString());
+  await Future.forEach(data, (element) async {
+    Map<String, dynamic> counterData = element as Map<String, dynamic>;
+    Counter c = Counter.fromJson(counterData);
+    Counter counter = await Repository.create(c.name);
+
+    await Future.forEach(counterData['events'], (element) async {
+      Map<String, dynamic> eventData = element as Map<String, dynamic>;
+      Event e = Event.fromJson(eventData);
+      await Repository.createEvent(counter, e.time, e.note);
+    });
+
+  });
 }

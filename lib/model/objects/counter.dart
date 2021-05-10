@@ -37,6 +37,10 @@ class Counter {
     };
   }
 
+  Counter.fromJson(Map<String, dynamic> json)
+      : _id = json['id'],
+        _name = json['name'];
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
