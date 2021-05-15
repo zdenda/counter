@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         // This is the theme of application.
         primarySwatch: Colors.teal,
+        appBarTheme: new AppBarTheme(brightness: Brightness.dark)
       ),
       home: MyHomePage(title: 'Counter'), // becomes the route named '/'
       routes: {
