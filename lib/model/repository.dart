@@ -24,7 +24,7 @@ class Repository {
   static final Future<Database> _database = _getDatabase();
 
   static Future<Database> _getDatabase() async => openDatabase(
-    join(await getDatabasesPath(), 'counter.db'),
+    join((await getDatabasesPath())!, 'counter.db'),
     onConfigure: (db) {
       // Enable foreign key constraints
       db.execute('PRAGMA foreign_keys=ON;');
@@ -86,7 +86,7 @@ class Repository {
     },
   );
 
-  static Future<Counter> create([String name]) async {
+  static Future<Counter> create([String? name]) async {
     final Database db = await _database;
     int id = await db.insert(
         TAB_COUNTER,
@@ -119,7 +119,7 @@ class Repository {
     );
   }
 
-  static Future<void> delete(int id) async {
+  static Future<void> delete(int? id) async {
     final db = await _database;
     await db.delete(
       TAB_COUNTER,
@@ -167,7 +167,7 @@ class Repository {
     });
   }
 
-  static Future<Counter> get(int id) async {
+  static Future<Counter?> get(int id) async {
     final Database db = await _database;
     List<Map<String, dynamic>> maps = await db.query(TAB_COUNTER,
         columns: [COL_ID, COL_NAME], where: "$COL_ID = ?", whereArgs: [id], limit: 1);
@@ -175,7 +175,7 @@ class Repository {
     return Counter(maps[0][COL_NAME], 0, maps[0][COL_ID]);
   }
 
-  static Future<List<Event>> getAllCounterEvents(int counterId) async {
+  static Future<List<Event>> getAllCounterEvents(int? counterId) async {
     final Database db = await _database;
     final List<Map<String, dynamic>> maps = await db.query(TAB_EVENT,
         columns: [COL_ID, COL_TIME, COL_NOTE],
@@ -191,7 +191,7 @@ class Repository {
     });
   }
 
-  static Future<Event> createEvent(Counter counter, DateTime time, String note) async {
+  static Future<Event> createEvent(Counter counter, DateTime time, String? note) async {
     final Database db = await _database;
     int id = await db.insert(
         TAB_EVENT,
@@ -205,7 +205,7 @@ class Repository {
     return new Event(id, time, note);
   }
 
-  static Future<void> deleteEvent(int id) async {
+  static Future<void> deleteEvent(int? id) async {
     final db = await _database;
     await db.delete(
       TAB_EVENT,
@@ -214,7 +214,7 @@ class Repository {
     );
   }
 
-  static Future<void> addEventNote(int id, String note) async {
+  static Future<void> addEventNote(int? id, String note) async {
     final db = await _database;
     await db.update(
       TAB_EVENT,

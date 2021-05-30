@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 
 
 class DetailArgs {
-  final int counterId;
+  final int? counterId;
   final String title;
 
   DetailArgs(this.counterId, this.title);
@@ -18,13 +18,13 @@ class DetailArgs {
 class DetailPage extends StatefulWidget {
   static const String ROUTE = '/detail';
 
-  static Future<T> goTo<T extends Object>(BuildContext context, Counter counter) {
+  static Future<T?> goTo<T extends Object?>(BuildContext context, Counter counter) {
     //TODO: try https://stackoverflow.com/questions/50818770/passing-data-to-a-stateful-widget
     return Navigator.pushNamed(context, DetailPage.ROUTE,
         arguments: DetailArgs(counter.id, counter.name));
   }
 
-  DetailPage({Key key}) : super(key: key);
+  DetailPage({Key? key}) : super(key: key);
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -33,13 +33,13 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
 
-  _incrementCounter(int counterId) async {
+  _incrementCounter(int? counterId) async {
     final appModel = Provider.of<AppModel>(context, listen: false);
     await appModel.incCounter(counterId);
   }
 
-  _showEditDialog(Counter counter) async {
-    Counter editedCounter = await showDialog<Counter>(
+  _showEditDialog(Counter? counter) async {
+    Counter? editedCounter = await showDialog<Counter>(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, setState) {
@@ -51,7 +51,7 @@ class _DetailPageState extends State<DetailPage> {
                 decoration: InputDecoration(
                   labelText: 'Name',
                 ),
-                initialValue: counter.name,
+                initialValue: counter!.name,
                 onChanged: (value) {
                   value = value.trim();
                   if (!value.isNullOrEmpty()) counter.name = value;
@@ -77,8 +77,8 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  void _showRemoveDialog(Counter counter) async {
-    bool result = await showDialog<bool>(
+  void _showRemoveDialog(Counter? counter) async {
+    bool? result = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -100,13 +100,13 @@ class _DetailPageState extends State<DetailPage> {
 
     if (result == true) {
       final appModel = Provider.of<AppModel>(context, listen: false);
-      await appModel.deleteCounter(counter);
+      await appModel.deleteCounter(counter!);
       Navigator.pop(context);
     }
   }
 
   void _showDeleteEventDialog(Event event) async {
-    bool result = await showDialog<bool>(
+    bool? result = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -133,10 +133,10 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _showEditNoteDialog(Event event) async {
-    String note = await showDialog<String>(
+    String? note = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
-          String result;
+          String? result;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: Text('Edit event note'),
@@ -173,16 +173,16 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final DetailArgs args = ModalRoute.of(context).settings.arguments;
+    final DetailArgs? args = ModalRoute.of(context)!.settings.arguments as DetailArgs?;
     return Consumer<AppModel>(
       builder: (context, appModel, child) {
         return FutureBuilder<Counter>(
-          future: appModel.getCounter(args.counterId),
+          future: appModel.getCounter(args!.counterId),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Scaffold(
                 appBar: AppBar(
-                  title: Text(snapshot.data.name),
+                  title: Text(snapshot.data!.name),
                   actions: <Widget>[
                     IconButton(
                       icon: const Icon(Icons.edit),
@@ -199,7 +199,7 @@ class _DetailPageState extends State<DetailPage> {
                     future: appModel.getEvents(args.counterId),
                     builder: (context, snapshot) {
                       if (snapshot.hasError ||
-                          (snapshot.hasData && snapshot.data.isEmpty) ||
+                          (snapshot.hasData && snapshot.data!.isEmpty) ||
                           snapshot.data == null) {
                         return Text('${snapshot.error ?? ''}');
                       } else {
@@ -209,15 +209,15 @@ class _DetailPageState extends State<DetailPage> {
                               width: double.infinity,
                               alignment: Alignment.center,
                               color: Theme.of(context).primaryColorLight,
-                              child: Text('${snapshot.data.length}',
+                              child: Text('${snapshot.data!.length}',
                                 style: Theme.of(context).textTheme.headline3),
                             ),
                             Expanded(
                               child: ListView.separated(
-                                itemCount: snapshot.data.length,
+                                itemCount: snapshot.data!.length,
                                 separatorBuilder: (context, index) => Divider(),
                                 itemBuilder: (context, index) {
-                                  var event = snapshot.data[index];
+                                  var event = snapshot.data![index];
                                   var now = DateTime.now();
                                   return ListTile(
                                     title: FittedBox(
@@ -229,7 +229,7 @@ class _DetailPageState extends State<DetailPage> {
                                         style: Theme.of(context).textTheme.headline5,
                                       ),
                                     ),
-                                    subtitle: !event.note.isNullOrEmpty() ? Text(event.note) : null,
+                                    subtitle: !event.note.isNullOrEmpty() ? Text(event.note!) : null,
                                     trailing: IconButton(
                                       icon: Icon(Icons.delete_forever),
                                       onPressed: () => _showDeleteEventDialog(event),
@@ -247,7 +247,7 @@ class _DetailPageState extends State<DetailPage> {
                 ),
                 floatingActionButton: FloatingActionButton(
                   child: Icon(Icons.plus_one),
-                  onPressed: () => _incrementCounter(snapshot.data.id),
+                  onPressed: () => _incrementCounter(snapshot.data!.id),
                 ),
               );
             }

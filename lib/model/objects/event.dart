@@ -3,13 +3,13 @@ import 'dart:convert';
 
 class Event {
 
-  int _id;
+  int? _id;
   DateTime _time;
-  String note;
+  String? note;
 
   Event(this._id, this._time, this.note);
 
-  int get id => _id;
+  int? get id => _id;
   DateTime get time => _time;
 
   Event.fromJson(Map<String, dynamic> json)

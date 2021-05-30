@@ -20,7 +20,7 @@ enum DialogResult { export, import }
 
 class MyHomePage extends StatefulWidget {
 
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: FutureBuilder<PackageInfo>(
                         future: PackageInfo.fromPlatform(),
                         builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-                          return Text('Version: ${snapshot.hasData ? snapshot.data.version : '…'}',
+                          return Text('Version: ${snapshot.hasData ? snapshot.data!.version : '…'}',
                               style: Theme.of(context).textTheme.headline6);
                         },
                       ),
@@ -124,10 +124,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _showAddCounterDialog(context) async {
-    String counterName = await showDialog<String>(
+    String? counterName = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
-          String name;
+          String? name;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: Text('New counter'),
@@ -167,7 +167,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _incrementCounter(int counterId) async {
+  void _incrementCounter(int? counterId) async {
     final appModel = Provider.of<AppModel>(context, listen: false);
     await appModel.incCounter(counterId);
   }
@@ -210,11 +210,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: FutureBuilder<UnmodifiableListView<Counter>>(
                   future: appModel.counters,
                   builder: (context, snapshot) {
-                    if (snapshot.hasData && snapshot.data.isNotEmpty) {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                       return ListView.builder(
-                          itemCount: snapshot.data.length,
+                          itemCount: snapshot.data!.length,
                           itemBuilder: (context, i) {
-                            var counter = snapshot.data[i];
+                            var counter = snapshot.data![i];
                             return Card(
                                 child: InkWell(
                                   onTap: () => DetailPage.goTo(context, counter),
@@ -269,7 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             );
                           }
                       );
-                    } else if (snapshot.hasData && snapshot.data.isEmpty) {
+                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                       return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                           child: Text(
@@ -308,9 +308,9 @@ Future<bool> _exportData() async {
   List<Map<String, dynamic>> data = [];
 
   final List<Counter> counters = await Repository.getAll();
-  await Future.forEach(counters, (counter) async {
+  await Future.forEach(counters, (dynamic counter) async {
     List<Event> events = await Repository.getAllCounterEvents(counter.id);
-    events.sort((a, b) => a.id.compareTo(b.id)); // sort events by IDs
+    events.sort((a, b) => a.id!.compareTo(b.id!)); // sort events by IDs
     Map<String, dynamic> map = counter.toJson();
     map['events'] = events;
     data.add(map);
@@ -325,18 +325,18 @@ Future<bool> _exportData() async {
 }
 
 Future<bool> _importData() async {
-  FilePickerResult result = await FilePicker.platform.pickFiles();
+  FilePickerResult? result = await FilePicker.platform.pickFiles();
   if (result == null) return false; // User canceled the picker
 
-  File file = File(result.files.single.path);
+  File file = File(result.files.single.path!);
 
   List<dynamic> data = jsonDecode(await file.readAsString());
-  await Future.forEach(data, (element) async {
+  await Future.forEach(data, (dynamic element) async {
     Map<String, dynamic> counterData = element as Map<String, dynamic>;
     Counter c = Counter.fromJson(counterData);
     Counter counter = await Repository.create(c.name);
 
-    await Future.forEach(counterData['events'], (element) async {
+    await Future.forEach(counterData['events'], (dynamic element) async {
       Map<String, dynamic> eventData = element as Map<String, dynamic>;
       Event e = Event.fromJson(eventData);
       await Repository.createEvent(counter, e.time, e.note);

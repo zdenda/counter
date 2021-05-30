@@ -9,7 +9,7 @@ import 'objects/counter.dart';
 
 class AppModel extends ChangeNotifier {
 
-  final Map<int, List<Event>> _events = {};
+  final Map<int?, List<Event>> _events = {};
   List<Counter> _counters = [];
 
   Future<UnmodifiableListView<Counter>> get counters async {
@@ -23,14 +23,14 @@ class AppModel extends ChangeNotifier {
     return (await counters).firstWhere((counter) => counter.id == counterId);
   }
 
-  Future<UnmodifiableListView<Event>> getEvents(int counterId) async {
+  Future<UnmodifiableListView<Event>> getEvents(int? counterId) async {
     if (!_events.containsKey(counterId)) {
       _events[counterId] = await Repository.getAllCounterEvents(counterId);
     }
-    return UnmodifiableListView(_events[counterId]);
+    return UnmodifiableListView(_events[counterId]!);
   }
 
-  Future<Counter> createCounter(String name) async {
+  Future<Counter> createCounter(String? name) async {
     final counter = await Repository.create(name);
     _counters.add(counter);
     notifyListeners();
@@ -52,7 +52,7 @@ class AppModel extends ChangeNotifier {
     return;
   }
 
-  Future<void> incCounter(int counterId) async {
+  Future<void> incCounter(int? counterId) async {
     _events.remove(counterId);
     var counter = _counters.firstWhere((counter) => counter.id == counterId);
     counter.inc();
