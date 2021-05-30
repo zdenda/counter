@@ -23,10 +23,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Counter',
       theme: ThemeData(
-        // This is the theme of application.
         primarySwatch: Colors.teal,
         appBarTheme: new AppBarTheme(brightness: Brightness.dark)
       ),
+      // Dark theme ignores primarySwatch color (https://github.com/flutter/flutter/issues/19089)
+      // luckily it uses teal, so no problem here, since app primary color is also teal
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode.system,
       home: MyHomePage(title: 'Counter'), // becomes the route named '/'
       routes: {
         DetailPage.ROUTE: (context) => DetailPage(), // '/detail'

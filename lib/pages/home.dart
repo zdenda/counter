@@ -48,8 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            backgroundColor: Colors.lightBlue.shade50,
-            title: Image.asset('assets/icon/ic_launcher.png', height: 70, width: 70),
+            title: Image.asset('assets/icon/ic_launcher.png', height: 60, width: 60),
             content: Container(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
