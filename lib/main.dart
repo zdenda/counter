@@ -1,7 +1,7 @@
 import 'package:counter/model/app_model.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:flutter/material.dart';
-import 'package:counter/pages/home.dart';
+import 'package:counter/pages/home/home.dart';
 import 'package:provider/provider.dart';
 
 
