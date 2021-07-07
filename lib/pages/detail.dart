@@ -2,6 +2,7 @@ import 'package:counter/model/app_model.dart';
 import 'package:counter/model/objects/counter.dart';
 import 'package:counter/model/objects/event.dart';
 import 'package:counter/utils/extensions.dart';
+import 'package:counter/utils/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
@@ -58,14 +59,8 @@ class _DetailPageState extends State<DetailPage> {
                 },
               ),
               actions: <Widget>[
-                FlatButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () => Navigator.of(context).pop()
-                ),
-                FlatButton(
-                    child: const Text('OK'),
-                    onPressed: () => Navigator.of(context).pop(counter)
-                ),
+                MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop()),
+                MyTextButton(text: 'OK', onPressed: () => Navigator.of(context).pop(counter)),
               ],
             );
           });
@@ -85,14 +80,8 @@ class _DetailPageState extends State<DetailPage> {
             title: Text('Remove this counter?'),
             //content: Text("Permanently remove the counter \"${counter.name}\"?"),
             actions: <Widget>[
-              FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () => Navigator.of(context).pop(false)
-              ),
-              FlatButton(
-                  child: const Text('REMOVE'),
-                  onPressed: () => Navigator.of(context).pop(true)
-              ),
+              MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop(false)),
+              MyTextButton(text: 'REMOVE', onPressed: () => Navigator.of(context).pop(true)),
             ],
           );
         }
@@ -113,14 +102,8 @@ class _DetailPageState extends State<DetailPage> {
             title: Text('Remove event?'),
             //content: Text("Permanently remove the counter \"${counter.name}\"?"),
             actions: <Widget>[
-              FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () => Navigator.of(context).pop(false)
-              ),
-              FlatButton(
-                  child: const Text('REMOVE'),
-                  onPressed: () => Navigator.of(context).pop(true)
-              ),
+              MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop(false)),
+              MyTextButton(text: 'REMOVE', onPressed: () => Navigator.of(context).pop(true)),
             ],
           );
         }
@@ -152,14 +135,8 @@ class _DetailPageState extends State<DetailPage> {
                 },
               ),
               actions: <Widget>[
-                FlatButton(
-                    child: const Text('CANCEL'),
-                    onPressed: () => Navigator.of(context).pop()
-                ),
-                FlatButton(
-                    child: const Text('OK'),
-                    onPressed: () => Navigator.of(context).pop(result)
-                ),
+                MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop()),
+                MyTextButton(text: 'OK', onPressed: () => Navigator.of(context).pop(result)),
               ],
             );
           });

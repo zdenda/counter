@@ -8,6 +8,7 @@ import 'package:counter/model/objects/event.dart';
 import 'package:counter/model/repository.dart';
 import 'package:counter/pages/detail.dart';
 import 'package:counter/utils/extensions.dart';
+import 'package:counter/utils/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
@@ -15,6 +16,7 @@ import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share/share.dart';
+
 
 enum DialogResult { export, import }
 
@@ -68,12 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             actions: <Widget>[
-              FlatButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              MyTextButton(text: 'OK', onPressed: () => Navigator.of(context).pop()),
             ],
           );
         }
@@ -123,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  void _showAddCounterDialog(context) async {
+  void _showAddCounterDialog(BuildContext context) async {
     String? counterName = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
@@ -140,19 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 onChanged: (value) => setState(() => name = value.trim()),
               ),
               actions: <Widget>[
-                FlatButton(
-                  child: const Text('CANCEL'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
+                MyTextButton(
+                  text: 'CANCEL',
+                  onPressed: () => Navigator.of(context).pop(),
                 ),
-                FlatButton(
-                  child: const Text('OK'),
-                  onPressed: name.isNullOrEmpty()
-                      ? null
-                      : () {
-                          Navigator.of(context).pop(name);
-                        },
+                MyTextButton(
+                  text: 'OK',
+                  onPressed: !name.isNullOrEmpty() ? () => Navigator.of(context).pop(name) : null
                 ),
               ],
             );
@@ -163,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.createCounter(counterName);
       final snackBar = SnackBar(content: Text('New counter "$counterName" was created!'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
