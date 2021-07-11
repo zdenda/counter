@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:counter/model/app_model.dart';
 import 'package:counter/model/objects/counter.dart';
-import 'package:counter/pages/detail.dart';
+import 'package:counter/pages/detail/detail.dart';
 import 'package:counter/pages/home/dialogs.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
