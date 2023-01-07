@@ -22,19 +22,20 @@ enum DialogResult { export, import }
 class Dialogs {
 
   static void showAddCounterDialog(BuildContext context) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     String? counterName = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           String? name;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: Text('New counter'),
+              title: const Text('New counter'),
               content: TextField(
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                ),
+                decoration: const InputDecoration(labelText: 'Name'),
                 onChanged: (value) => setState(() => name = value.trim()),
               ),
               actions: <Widget>[
@@ -52,10 +53,10 @@ class Dialogs {
         });
 
     if (!counterName.isNullOrEmpty()) {
-      final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.createCounter(counterName);
-      final snackBar = SnackBar(content: Text('New counter "$counterName" was created!'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      scaffoldMessenger.showSnackBar(
+          SnackBar(content: Text('New counter "$counterName" was created!'))
+      );
     }
   }
 
@@ -65,23 +66,21 @@ class Dialogs {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Image.asset('assets/icon/ic_launcher.png', height: 60, width: 60),
-            content: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text('Counter', style: Theme.of(context).textTheme.headline4),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 24),
-                    child: FutureBuilder<PackageInfo>(
-                      future: PackageInfo.fromPlatform(),
-                      builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-                        return Text('Version: ${snapshot.hasData ? snapshot.data!.version : '…'}',
-                            style: Theme.of(context).textTheme.headline6);
-                      },
-                    ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text('Counter', style: Theme.of(context).textTheme.headline4),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: FutureBuilder<PackageInfo>(
+                    future: PackageInfo.fromPlatform(),
+                    builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+                      return Text('Version: ${snapshot.hasData ? snapshot.data!.version : '…'}',
+                          style: Theme.of(context).textTheme.headline6);
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             actions: <Widget>[
               MyTextButton(text: 'OK', onPressed: () => Navigator.of(context).pop()),
@@ -112,7 +111,7 @@ class Dialogs {
       case DialogResult.export:
         if (await _exportData()) {
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('App data were exported to a file.'))
+              const SnackBar(content: Text('App data were exported to a file.'))
           );
         }
         break;
@@ -120,7 +119,7 @@ class Dialogs {
         if (await _importData()) {
           appModel.forceUpdate();
           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Application data were imported.'))
+              const SnackBar(content: Text('Application data were imported.'))
           );
         }
         break;
@@ -136,7 +135,7 @@ class Dialogs {
 Future<bool> _exportData() async {
   Directory tempDir = await getTemporaryDirectory();
   final String date = Jiffy().format("yyyy-MM-dd");
-  File exportFile = new File('${tempDir.path}/counter-data-export_$date.json');
+  File exportFile = File('${tempDir.path}/counter-data-export_$date.json');
 
   List<Map<String, dynamic>> data = [];
 
@@ -151,8 +150,8 @@ Future<bool> _exportData() async {
 
   await exportFile.writeAsString(jsonEncode(data));
 
-  await Share.shareFiles([exportFile.path],
-      subject: "Counter data export", mimeTypes: ["application/json"]);
+  await Share.shareXFiles([XFile(exportFile.path, mimeType: "application/json")],
+      subject: "Counter data export");
 
   return true;
 }

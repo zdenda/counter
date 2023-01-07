@@ -22,7 +22,7 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -43,11 +43,11 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (BuildContext context) {
             return [
               PopupMenuItem<Function>(
-                  child: Text('Export / Import'),
+                  child: const Text('Export / Import'),
                   value: () => Dialogs.showExportDialog(context, appModel)
               ),
               PopupMenuItem<Function>(
-                  child: Text('About'),
+                  child: const Text('About'),
                   value: () => Dialogs.showAboutAppDialog(context)
               ),
             ];
@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       FittedBox(
                         fit: BoxFit.fitWidth,
                         child: Text(
-                            '${counter.name}',
+                            counter.name,
                             style: Theme.of(context).textTheme.headline4
                         ),
                       ),
@@ -114,8 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: const ShapeDecoration(shape: CircleBorder()),
                   child: IconButton(
                     iconSize: 36,
-                    icon: Icon(Icons.add_circle_outline),
-                    color: Theme.of(context).accentColor,
+                    icon: const Icon(Icons.add_circle_outline),
+                    color: Theme.of(context).colorScheme.secondary,
                     onPressed: () => _incrementCounter(counter.id),
                   ),
                 ),
@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       var data = snapshot.requireData;
                       return data.isEmpty ? _emptyList(context): _listView(data);
                     } else {
-                      return CircularProgressIndicator();
+                      return const CircularProgressIndicator();
                     }
                   }
               )
@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
               return FloatingActionButton(
                 onPressed: () => Dialogs.showAddCounterDialog(context),
                 tooltip: 'Create a new Counter',
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
               );
             },
           )

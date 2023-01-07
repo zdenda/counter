@@ -3,7 +3,7 @@ import '../repository.dart';
 
 class Counter {
 
-  int? _id;
+  final int? _id;
   String? _name;
   int? _value;
   DateTime? _lastEventTime;
@@ -24,7 +24,7 @@ class Counter {
   }
   int inc() {
     _lastEventTime = DateTime.now();
-    if (_value == null) _value = 0;
+    _value ??= 0;
     _value = _value! + 1;
     return _value!;
   }

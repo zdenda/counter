@@ -10,12 +10,14 @@ void main() => runApp(
       providers: [
         ChangeNotifierProvider(create: (context) => AppModel())
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
 );
 
 
 class MyApp extends StatelessWidget {
+
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -23,7 +25,8 @@ class MyApp extends StatelessWidget {
 
     final lightTheme = ThemeData(
         primarySwatch: Colors.teal,
-        appBarTheme: new AppBarTheme(brightness: Brightness.dark),
+        //TODO: Why it was here? it seems to be working without it
+        //appBarTheme: new AppBarTheme(brightness: Brightness.dark),
     );
 
     // Dark theme ignores primarySwatch color (https://github.com/flutter/flutter/issues/19089)
@@ -35,9 +38,9 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
-      home: MyHomePage(title: 'Counter'), // becomes the route named '/'
+      home: const MyHomePage(title: 'Counter'), // becomes the route named '/'
       routes: {
-        DetailPage.ROUTE: (context) => DetailPage(), // '/detail'
+        DetailPage.ROUTE: (context) => const DetailPage(), // '/detail'
       },
     );
   }

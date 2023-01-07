@@ -25,7 +25,7 @@ class DetailPage extends StatefulWidget {
         arguments: DetailArgs(counter.id, counter.name));
   }
 
-  DetailPage({Key? key}) : super(key: key);
+  const DetailPage({Key? key}) : super(key: key);
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -54,35 +54,33 @@ class _DetailPageState extends State<DetailPage> {
           )
         ],
       ),
-      body: Container(
-        child: FutureBuilder<List<Event>>(
-          future: appModel.getEvents(counter.id),
-          builder: (context, snapshot) {
-            if (snapshot.hasError ||
-                (snapshot.hasData && snapshot.data!.isEmpty) ||
-                snapshot.data == null) {
-              return Text('${snapshot.error ?? ''}');
-            } else {
-              List<Event> events = snapshot.data!;
-              return Column(
-                children: <Widget>[
-                  Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    color: Theme.of(context).primaryColorLight,
-                    child: Text('${events.length}', style: Theme.of(context).textTheme.headline3),
-                  ),
-                  Expanded(
-                    child: _eventsListView(events),
-                  ),
-                ],
-              );
-            }
-          },
-        ),
+      body: FutureBuilder<List<Event>>(
+        future: appModel.getEvents(counter.id),
+        builder: (context, snapshot) {
+          if (snapshot.hasError ||
+              (snapshot.hasData && snapshot.data!.isEmpty) ||
+              snapshot.data == null) {
+            return Text('${snapshot.error ?? ''}');
+          } else {
+            List<Event> events = snapshot.data!;
+            return Column(
+              children: <Widget>[
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  color: Theme.of(context).primaryColorLight,
+                  child: Text('${events.length}', style: Theme.of(context).textTheme.headline3),
+                ),
+                Expanded(
+                  child: _eventsListView(events),
+                ),
+              ],
+            );
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.plus_one),
+        child: const Icon(Icons.plus_one),
         onPressed: () => _incrementCounter(counter.id),
       ),
     );
@@ -91,7 +89,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget _eventsListView(List<Event> events) {
     return ListView.separated(
       itemCount: events.length,
-      separatorBuilder: (context, index) => Divider(),
+      separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) {
         Event event = events[index];
         var now = DateTime.now();
@@ -107,7 +105,7 @@ class _DetailPageState extends State<DetailPage> {
           ),
           subtitle: event.note.isNullOrEmpty() ? null : Text(event.note!),
           trailing: IconButton(
-            icon: Icon(Icons.delete_forever),
+            icon: const Icon(Icons.delete_forever),
             onPressed: () => Dialogs.showDeleteEventDialog(context, event),
           ),
           onTap: () => Dialogs.showEditNoteDialog(context, event),
@@ -137,7 +135,7 @@ class _DetailPageState extends State<DetailPage> {
                   child:
                       snapshot.hasError
                           ? Text("${snapshot.error}")
-                          : CircularProgressIndicator(),
+                          : const CircularProgressIndicator(),
                 ),
               );
             }

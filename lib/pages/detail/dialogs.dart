@@ -11,18 +11,18 @@ import 'package:provider/provider.dart';
 class Dialogs {
 
   static void showEditDialog(BuildContext context, Counter? counter) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+
     Counter? editedCounter = await showDialog<Counter>(
         context: context,
         builder: (BuildContext context) {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: Text('Edit counter'),
+              title: const Text('Edit counter'),
               content: TextFormField(
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                ),
+                decoration: const InputDecoration(labelText: 'Name'),
                 initialValue: counter!.name,
                 onChanged: (value) {
                   value = value.trim();
@@ -38,17 +38,18 @@ class Dialogs {
         });
 
     if (editedCounter != null) {
-      final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.updateCounter(editedCounter);
     }
   }
 
   static void showRemoveDialog(BuildContext context, Counter? counter) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+
     bool? result = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Remove this counter?'),
+            title: const Text('Remove this counter?'),
             //content: Text("Permanently remove the counter \"${counter.name}\"?"),
             actions: <Widget>[
               MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop(false)),
@@ -59,18 +60,19 @@ class Dialogs {
     );
 
     if (result == true) {
-      final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.deleteCounter(counter!);
       Navigator.pop(context);
     }
   }
 
   static void showDeleteEventDialog(BuildContext context, Event event) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+
     bool? result = await showDialog<bool>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Remove event?'),
+            title: const Text('Remove event?'),
             //content: Text("Permanently remove the counter \"${counter.name}\"?"),
             actions: <Widget>[
               MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop(false)),
@@ -81,25 +83,24 @@ class Dialogs {
     );
 
     if (result == true) {
-      final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.deleteEvent(event);
     }
   }
 
   static void showEditNoteDialog(BuildContext context, Event event) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+
     String? note = await showDialog<String>(
         context: context,
         builder: (BuildContext context) {
           String? result;
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
-              title: Text('Edit event note'),
+              title: const Text('Edit event note'),
               content: TextFormField(
                 autofocus: true,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: 'Note',
-                ),
+                decoration: const InputDecoration(labelText: 'Note'),
                 initialValue: event.note ?? "",
                 onChanged: (value) {
                   result = value.trim();
@@ -114,7 +115,6 @@ class Dialogs {
         });
 
     if (note != null) {
-      final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.addNote(event, note);
     }
   }

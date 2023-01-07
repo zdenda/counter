@@ -13,7 +13,7 @@ import 'package:counter/main.dart';
 void main() {
   testWidgets('Counter has a plus button', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    await tester.pumpWidget(const MyApp());
 
     // Verify that there is a plus button.
     expect(find.byIcon(Icons.add), findsOneWidget);

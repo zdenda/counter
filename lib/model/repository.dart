@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:developer' as developer;
 
 import 'package:path/path.dart';
@@ -24,7 +26,7 @@ class Repository {
   static final Future<Database> _database = _getDatabase();
 
   static Future<Database> _getDatabase() async => openDatabase(
-    join((await getDatabasesPath())!, 'counter.db'),
+    join((await getDatabasesPath()), 'counter.db'),
     onConfigure: (db) {
       // Enable foreign key constraints
       db.execute('PRAGMA foreign_keys=ON;');
@@ -95,7 +97,7 @@ class Repository {
         },
         conflictAlgorithm: ConflictAlgorithm.replace
     );
-    return new Counter(name, 0, id);
+    return Counter(name, 0, id);
   }
 
   static Future<void> update(Counter counter) async {
@@ -202,7 +204,7 @@ class Repository {
         },
         conflictAlgorithm: ConflictAlgorithm.replace
     );
-    return new Event(id, time, note);
+    return Event(id, time, note);
   }
 
   static Future<void> deleteEvent(int? id) async {
