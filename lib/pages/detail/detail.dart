@@ -111,6 +111,7 @@ class _DetailPageState extends State<DetailPage> {
             onPressed: () => Dialogs.showDeleteEventDialog(context, event),
           ),
           onTap: () => Dialogs.showEditNoteDialog(context, event),
+          onLongPress: () => Dialogs.showEditNoteTimeDialog(context, event),
         );
       },
     );

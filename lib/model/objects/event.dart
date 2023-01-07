@@ -3,18 +3,17 @@ import 'dart:convert';
 
 class Event {
 
-  int? _id;
-  DateTime _time;
+  final int? _id;
+  DateTime time;
   String? note;
 
-  Event(this._id, this._time, this.note);
+  Event(this._id, this.time, this.note);
 
   int? get id => _id;
-  DateTime get time => _time;
 
   Event.fromJson(Map<String, dynamic> json)
       : _id = json['id'],
-        _time = DateTime.parse(json['time']),
+        time = DateTime.parse(json['time']),
         note = json['note'];
 
   Map<String, dynamic> toJson() => {

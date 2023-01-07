@@ -4,6 +4,7 @@ import 'package:counter/model/objects/event.dart';
 import 'package:counter/utils/extensions.dart';
 import 'package:counter/utils/widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 
 
@@ -115,6 +116,65 @@ class Dialogs {
     if (note != null) {
       final appModel = Provider.of<AppModel>(context, listen: false);
       await appModel.addNote(event, note);
+    }
+  }
+
+  static void showEditNoteTimeDialog(BuildContext context, Event event) async {
+    final appModel = Provider.of<AppModel>(context, listen: false);
+
+    pickDate(DateTime initialDate, void Function(DateTime) onDatePicked) => {
+          showDatePicker(
+                  context: context,
+                  initialDate: initialDate,
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now())
+              .then((value) => {if (value != null) onDatePicked(value)})
+        };
+
+    pickTime(DateTime initialDate, void Function(TimeOfDay) onTimePicked) => {
+          showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.fromDateTime(initialDate),
+          ).then((value) => {if (value != null) onTimePicked(value)})
+        };
+
+    DateTime? time = await showDialog<DateTime>(
+        context: context,
+        builder: (BuildContext context) {
+          DateTime result = event.time.copy();
+          return AlertDialog(
+            title: const Text('Edit event time'),
+            content: StatefulBuilder(builder: (context, setState) {
+              return Column(children: [
+                InkWell(
+                    onTap: () =>
+                        pickDate(result, (date) => setState(() => result = result.applyDate(date))),
+                    child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          Text(Jiffy(result).yMMMd),
+                          const Icon(Icons.edit, size: 18)
+                        ]))),
+                InkWell(
+                    onTap: () =>
+                        pickTime(result, (time) => setState(() => result = result.applyTime(time))),
+                    child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [Text(Jiffy(result).Hm), const Icon(Icons.edit, size: 18)]))),
+              ]);
+            }),
+            scrollable: true,
+            actions: [
+              MyTextButton(text: 'CANCEL', onPressed: () => Navigator.of(context).pop()),
+              MyTextButton(text: 'OK', onPressed: () => Navigator.of(context).pop(result))
+            ],
+          );
+        });
+
+    if (time != null) {
+      await appModel.updateTime(event, time);
     }
   }
 

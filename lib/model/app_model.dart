@@ -78,6 +78,13 @@ class AppModel extends ChangeNotifier {
     return;
   }
 
+  Future<void> updateTime(Event event, DateTime time) async {
+    await Repository.updateEventTime(event.id, time);
+    event.time = time;
+    notifyListeners();
+    return;
+  }
+
   forceUpdate() {
     _counters.clear();
     _events.clear();

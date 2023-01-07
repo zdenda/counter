@@ -226,4 +226,16 @@ class Repository {
     );
   }
 
+  static Future<void> updateEventTime(int? id, DateTime time) async {
+    final db = await _database;
+    await db.update(
+      TAB_EVENT,
+      {
+        Repository.COL_TIME: time.millisecondsSinceEpoch,
+      },
+      where: "$COL_ID = ?",
+      whereArgs: [id],
+    );
+  }
+
 }
