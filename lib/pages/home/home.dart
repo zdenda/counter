@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Text(
           "Tap on the + button to create a new counter.",
-          style: Theme.of(context).textTheme.headline4,
+          style: Theme.of(context).textTheme.headlineMedium,
           textAlign: TextAlign.center,
         )
     );
@@ -91,14 +91,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         fit: BoxFit.fitWidth,
                         child: Text(
                             counter.name,
-                            style: Theme.of(context).textTheme.headline4
+                            style: Theme.of(context).textTheme.headlineMedium
                         ),
                       ),
                       if (counter.lastEventTime != null)
                         FittedBox(
                           fit: BoxFit.fitWidth,
-                          child: Text('Last time: ${Jiffy(counter.lastEventTime).fromNow()}',
-                              style: Theme.of(context).textTheme.caption
+                          child: Text('Last time: ${Jiffy.parseFromDateTime(counter.lastEventTime!).fromNow()}',
+                              style: Theme.of(context).textTheme.bodySmall
                           ),
                         ),
                     ],
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 0, 12, 0),
                   child: Text('${counter.value}',
-                      style: Theme.of(context).textTheme.headline3
+                      style: Theme.of(context).textTheme.displaySmall
                   ),
                 ),
                 Ink(

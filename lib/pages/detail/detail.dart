@@ -68,8 +68,8 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   width: double.infinity,
                   alignment: Alignment.center,
-                  color: Theme.of(context).primaryColorLight,
-                  child: Text('${events.length}', style: Theme.of(context).textTheme.headline3),
+                  color: Theme.of(context).secondaryHeaderColor,
+                  child: Text('${events.length}', style: Theme.of(context).textTheme.displaySmall),
                 ),
                 Expanded(
                   child: _eventsListView(events),
@@ -97,10 +97,11 @@ class _DetailPageState extends State<DetailPage> {
           title: FittedBox(
             fit: BoxFit.fitWidth,
             child: Text(
-              '${Jiffy(event.time).format(event.time.year == now.year
-                  ? 'EEE, MMM d HH:mm'
-                  : 'MMM d, yyyy')} • ${Jiffy(event.time).fromNow()}',
-              style: Theme.of(context).textTheme.headline5,
+              '${Jiffy.parseFromDateTime(event.time).format(
+                  pattern: event.time.year == now.year
+                    ? 'EEE, MMM d HH:mm'
+                    : 'MMM d, yyyy')} • ${Jiffy.parseFromDateTime(event.time).fromNow()}',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ),
           subtitle: event.note.isNullOrEmpty() ? null : Text(event.note!),

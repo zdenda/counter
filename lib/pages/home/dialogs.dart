@@ -69,14 +69,14 @@ class Dialogs {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text('Counter', style: Theme.of(context).textTheme.headline4),
+                Text('Counter', style: Theme.of(context).textTheme.headlineMedium),
                 Padding(
                   padding: const EdgeInsets.only(top: 24),
                   child: FutureBuilder<PackageInfo>(
                     future: PackageInfo.fromPlatform(),
                     builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
                       return Text('Version: ${snapshot.hasData ? snapshot.data!.version : '…'}',
-                          style: Theme.of(context).textTheme.headline6);
+                          style: Theme.of(context).textTheme.titleLarge);
                     },
                   ),
                 ),
@@ -134,7 +134,7 @@ class Dialogs {
 
 Future<bool> _exportData() async {
   Directory tempDir = await getTemporaryDirectory();
-  final String date = Jiffy().format("yyyy-MM-dd");
+  final String date = Jiffy.now().format(pattern: "yyyy-MM-dd");
   File exportFile = File('${tempDir.path}/counter-data-export_$date.json');
 
   List<Map<String, dynamic>> data = [];

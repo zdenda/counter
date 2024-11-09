@@ -152,7 +152,7 @@ class Dialogs {
                     child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Text(Jiffy(result).yMMMd),
+                          Text(Jiffy.parseFromDateTime(result).yMMMd),
                           const Icon(Icons.edit, size: 18)
                         ]))),
                 InkWell(
@@ -162,7 +162,7 @@ class Dialogs {
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: [Text(Jiffy(result).Hm), const Icon(Icons.edit, size: 18)]))),
+                            children: [Text(Jiffy.parseFromDateTime(result).Hm), const Icon(Icons.edit, size: 18)]))),
               ]);
             }),
             scrollable: true,

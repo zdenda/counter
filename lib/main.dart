@@ -23,15 +23,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final lightTheme = ThemeData(
-        primarySwatch: Colors.teal,
-        //TODO: Why it was here? it seems to be working without it
-        //appBarTheme: new AppBarTheme(brightness: Brightness.dark),
-    );
+    const colorSchemeSeed = Colors.teal;
 
-    // Dark theme ignores primarySwatch color (https://github.com/flutter/flutter/issues/19089)
-    // luckily it uses teal, so no problem here, since app primary color is also teal
-    final darkTheme = ThemeData(primarySwatch: Colors.teal, brightness: Brightness.dark);
+    final lightTheme = ThemeData(colorSchemeSeed: colorSchemeSeed);
+    final darkTheme = ThemeData(
+        colorSchemeSeed: colorSchemeSeed, brightness: Brightness.dark
+    );
 
     return MaterialApp(
       title: 'Counter',
