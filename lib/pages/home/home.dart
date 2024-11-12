@@ -70,6 +70,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _listView(UnmodifiableListView<Counter> data) {
     return ListView.builder(
+        // use key to force rebuild of the list when dark/light mode is switched,
+        // to use proper colors for texts in cards
+        key: ValueKey(MediaQuery.of(context).platformBrightness),
         itemCount: data.length,
         itemBuilder: (context, index) => _listItem(context, data[index])
     );
