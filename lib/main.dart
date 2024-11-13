@@ -26,8 +26,16 @@ class MyApp extends StatelessWidget {
     const colorSchemeSeed = Colors.teal;
 
     final lightTheme = ThemeData(colorSchemeSeed: colorSchemeSeed);
+
+    final darkColorScheme = ColorScheme.fromSeed(
+      seedColor: colorSchemeSeed,
+      brightness: Brightness.dark,
+    ).copyWith(
+      surfaceContainerLow: const Color(0xff1a2120),
+    );
     final darkTheme = ThemeData(
-        colorSchemeSeed: colorSchemeSeed, brightness: Brightness.dark
+      colorScheme: darkColorScheme,
+      dialogBackgroundColor: darkColorScheme.surfaceContainerHigh,
     );
 
     return MaterialApp(
